@@ -1,0 +1,365 @@
+
+```{r  echo=TRUE, message=FALSE, warning=FALSE}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(modelr)
+library(purrr)
+
+location <- paste(getwd(),"ddf--gapminder--systema_globalis-master","countries-etc-datapoints",sep = "/")
+setwd(location)
+
+rv <- as.data.frame(read_csv("ddf--datapoints--life_expectancy_years--by--geo--time.csv",col_types = cols())) %>% dplyr::inner_join(as.data.frame(read_csv("ddf--datapoints--infant_mortality_rate_per_1000_births--by--geo--time.csv",col_types = cols())), by = c("geo","time")) %>%
+dplyr::inner_join(as.data.frame(read_csv("ddf--datapoints--murder_per_100000_people--by--geo--time.csv",col_types = cols())), by = c("geo","time"))  %>%
+dplyr::inner_join(as.data.frame(read_csv("ddf--datapoints--gdppercapita_us_inflation_adjusted--by--geo--time.csv",col_types = cols())), by = c("geo","time")) %>%
+dplyr::inner_join(as.data.frame(read_csv("ddf--datapoints--medical_doctors_per_1000_people--by--geo--time.csv",col_types = cols())), by = c("geo","time")) %>%
+dplyr::inner_join(as.data.frame(read_csv("ddf--datapoints--poverty_percent_people_below_550_a_day--by--geo--time.csv",col_types = cols())), by = c("geo","time"))
+# rv <- as.data.frame(subset(rv, !rv$poverty_percent_people_below_550_a_day==0))
+# rv
+```
+
+Used the cor(x,y,method) function to determine whether which log transformations on the predictor or response variable or log transformations on both of them or none of them, generates stronger co-efficient correlation, and then visualised the plots for response variable versus all predictors as follows.
+
+```{r  message=FALSE, warning=FALSE}
+cor(rv$infant_mortality_rate_per_1000_births, rv$life_expectancy_years, method = c("pearson", "kendall", "spearman"))
+cor(log10(rv$infant_mortality_rate_per_1000_births), rv$life_expectancy_years, method = c("pearson", "kendall", "spearman"))
+cor(rv$infant_mortality_rate_per_1000_births, log10(rv$life_expectancy_years), method = c("pearson", "kendall", "spearman"))
+cor(log10(rv$infant_mortality_rate_per_1000_births), log10(rv$life_expectancy_years), method = c("pearson", "kendall", "spearman"))
+
+plt1_g <- ggplot(rv, aes(x=log10(infant_mortality_rate_per_1000_births),y=log10(life_expectancy_years)))+
+        geom_point(size=0.1)+
+        geom_smooth(color = "red")+
+        geom_smooth(method = "lm")+
+  theme_minimal()
+plt1_g
+
+```
+
+The relationship between life expectancy and log transformation of infant mortality rate has the strongest coeffecient correlation and there is a negative coefficient correlation between these two continuous variables. For every increase in value of x, the value of y decreases depending upon how steep the slope is.
+
+
+```{r  message=FALSE, warning=FALSE}
+cor(rv$murder_per_100000_people, rv$life_expectancy_years, method = c("pearson", "kendall", "spearman"))
+cor(log10(rv$murder_per_100000_people), rv$life_expectancy_years, method = c("pearson", "kendall", "spearman"))
+cor(rv$murder_per_100000_people, log10(rv$life_expectancy_years), method = c("pearson", "kendall", "spearman"))
+cor(log10(rv$murder_per_100000_people), log10(rv$life_expectancy_years), method = c("pearson", "kendall", "spearman"))
+
+plt2_g <- ggplot(rv, aes(x=log10(murder_per_100000_people),y=life_expectancy_years))+
+        geom_point(size=0.1)+
+        geom_smooth(color="red")+
+        geom_smooth(method = "lm")+
+  theme_minimal()
+plt2_g
+```
+The relationship between life expectancy and log transformation of murder per 100,000 people has the strongest coeffecient correlation and there is a negative coefficient correlation between these two continuous variables. For every increase in value of x, the value of y decreases depending upon how steep the slope is.
+
+
+
+```{r  message=FALSE, warning=FALSE}
+cor(rv$gdppercapita_us_inflation_adjusted, rv$life_expectancy_years, method = c("pearson", "kendall", "spearman"))
+cor(log10(rv$gdppercapita_us_inflation_adjusted), rv$life_expectancy_years, method = c("pearson", "kendall", "spearman"))
+cor(rv$gdppercapita_us_inflation_adjusted, log10(rv$life_expectancy_years), method = c("pearson", "kendall", "spearman"))
+cor(log10(rv$gdppercapita_us_inflation_adjusted), log10(rv$life_expectancy_years), method = c("pearson", "kendall", "spearman"))
+
+plt3_g <- ggplot(rv, aes(x=log10(gdppercapita_us_inflation_adjusted),y=life_expectancy_years))+
+        geom_point(size=0.1)+
+        geom_smooth(color="red")+
+        geom_smooth(method = "lm")+
+  theme_minimal()
+plt3_g
+```
+The relationship between life expectancy and log transformation of GDP per capita (US$ adjusted for inflation) has the strongest coeffecient correlation and there is a positive coefficient correlation between these two continuous variables. For every increase in value of x, the value of y increases depending upon how steep the slope is.
+
+
+
+
+```{r  message=FALSE, warning=FALSE}
+cor(rv$medical_doctors_per_1000_people, rv$life_expectancy_years, method = c("pearson", "kendall", "spearman"))
+cor(log10(rv$medical_doctors_per_1000_people), rv$life_expectancy_years, method = c("pearson", "kendall", "spearman"))
+cor(rv$medical_doctors_per_1000_people, log10(rv$life_expectancy_years), method = c("pearson", "kendall", "spearman"))
+cor(log10(rv$medical_doctors_per_1000_people), log10(rv$life_expectancy_years), method = c("pearson", "kendall", "spearman"))
+
+plt4_g <- ggplot(rv, aes(x=medical_doctors_per_1000_people,y=life_expectancy_years))+
+        geom_point(size=0.1)+
+        geom_smooth(color="red")+
+        geom_smooth(method = "lm")+
+  theme_minimal()
+plt4_g
+
+nrow(rv)
+```
+The relationship between life expectancy and Medical doctors (per 1,000 people) has the strongest coeffecient correlation and there is a positive coefficient correlation between these two continuous variables. For every increase in value of x, the value of y increases depending upon how steep the slope is.
+
+
+
+```{r  message=FALSE, warning=FALSE}
+cor( rv$poverty_percent_people_below_550_a_day, rv$life_expectancy_years, method = c("pearson", "kendall", "spearman"))
+cor( log10(rv$poverty_percent_people_below_550_a_day), rv$life_expectancy_years, method = c("pearson", "kendall", "spearman"))
+cor( rv$poverty_percent_people_below_550_a_day, log10(rv$life_expectancy_years), method = c("pearson", "kendall", "spearman"))
+cor(log10(rv$poverty_percent_people_below_550_a_day), log10(rv$life_expectancy_years), method = c("pearson", "kendall", "spearman"))
+
+plt5_g <- ggplot(rv, aes(x=log10(poverty_percent_people_below_550_a_day),y=life_expectancy_years))+
+        geom_point(size=0.1)+
+        geom_smooth(color="red")+
+        geom_smooth(method = "lm")+
+  theme_minimal()
+plt5_g
+```
+The relationship between life expectancy and log transformation of Poverty rate (people below $5.50 a day) has the strongest coeffecient correlation and there is a negative coefficient correlation between these two continuous variables. For every increase in value of x, the value of y decreases depending upon how steep the slope is.
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+There are predictors with negative and positive correlation coeffecient both, but the one that has the strongest coeffecient correlation either negative or the positive one : depicts that the response variable is how much related to the predictor. The higher the coeffecient correlation to either negative or positive "one', the better the relationship between the response variable and the predictor.
+
+So the highest coeffecient correlation is of response variable "life expectancy" with the predictor "infant mortality rate", strongly negative coeffecient correlation meaning that for certain increases in value of infant mortality rate, there is a considerable amount of decrease in life expectancy
+
+Building & plotting the model(naming it model 1) and then Performing Model Diagonostics using residual plot:
+```{r}
+  model1 <- lm(log10(life_expectancy_years) ~ log10(infant_mortality_rate_per_1000_births),data = rv)
+
+  rv <- rv %>%
+  add_predictions(model1, "log10pred") %>%
+  mutate(pred = 10^log10pred) %>%
+  add_residuals(model1, "residuals")
+  
+  
+  plt <-ggplot(rv,aes(x=infant_mortality_rate_per_1000_births)) +
+  geom_point(aes(y=life_expectancy_years),size = 0.1) +
+  geom_line(aes(y=pred), color="red", size=1) +
+  theme_minimal()
+
+  plt
+
+  plt1 <- ggplot(rv,aes(x=log10(infant_mortality_rate_per_1000_births))) +
+  geom_point(aes(y=residuals), size = 0.1) +
+  theme_minimal()
+  
+  plt1
+  
+  print (c("The RMSE of the current model is",modelr::rmse(model1,rv)))
+```
+As the definition of residual plot says that when residuals are plotted on y axis and the independent variable is plotted on x-axis and the points are randomly scattered, the model is appropriate for the linear regression on the given data. Since the points above are randomly scattered, the model built is appropriate for linear regression.
+
+While the residual plot is roughly scattered, there is one outlier that seems very odd, which is the infant mortality rate between 45 to 50 (which in log case is greater than 1.5) and its residual is negative 1 tenth (-0.1), and this is the only point that is very oddly apart from the remaining data.
+
+
+Removing the outliers below and refitting model so that the model is more appropriate: 
+```{r}
+  tmp <- as.data.frame(rv$residuals[!rv$residuals %in% boxplot.stats(rv$residuals)$out])
+  tmp <- rename(tmp,"residuals" = "rv$residuals[!rv$residuals %in% boxplot.stats(rv$residuals)$out]")
+  rv <- inner_join(rv,tmp, by = c("residuals" = "residuals"))
+  
+  
+  plt <-ggplot(rv,aes(x=infant_mortality_rate_per_1000_births)) +
+  geom_point(aes(y=life_expectancy_years),size = 0.1) +
+  geom_line(aes(y=pred), color="red", size=1) +
+  theme_minimal()
+
+  plt
+  
+  plt1 <- ggplot(rv,aes(x=log10(infant_mortality_rate_per_1000_births))) +
+  geom_point(aes(y=residuals), size = 0.1) +
+  theme_minimal()
+  
+  plt1
+  
+  print (c("The RMSE of the model after removing all outliers is",modelr::rmse(model1,rv)))
+```
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+##solution 3
+
+```{r}
+cnd1 <- rv %>%
+  add_residuals(model1, "residuals") %>%
+  ggplot(aes(x=log10(murder_per_100000_people))) +
+  geom_point(aes(y=residuals), size = 0.1) +
+  theme_minimal()
+
+cnd1
+
+```
+
+
+```{r}
+cnd2 <- rv %>%
+  add_residuals(model1, "residuals") %>%
+  ggplot(aes(x=log10(gdppercapita_us_inflation_adjusted))) +
+  geom_point(aes(y=residuals), size = 0.1) +
+  theme_minimal()
+
+cnd2
+```
+
+
+```{r}
+cnd3 <- rv %>%
+  add_residuals(model1, "residuals") %>%
+  ggplot(aes(x=log10(medical_doctors_per_1000_people))) +
+  geom_point(aes(y=residuals), size = 0.1) +
+  theme_minimal()
+
+cnd3
+```
+
+
+```{r}
+cnd4 <- rv %>%
+  add_residuals(model1, "residuals") %>%
+  ggplot(aes(x=log10(poverty_percent_people_below_550_a_day))) +
+  geom_point(aes(y=residuals), size = 0.1) +
+  theme_minimal()
+
+cnd4
+```
+
+Choosing the murder_per_100000_people predictor to add to the already existing model which contains life_expectancy_years as response variable and infant_mortality_rate_per_1000_births as the predictor, as it is most evenly scattered than compared to any other left predictors. Remodifying the model and naming it model 2.
+```{r}
+model2 <- lm(log10(life_expectancy_years) ~ log10(infant_mortality_rate_per_1000_births)+log10(murder_per_100000_people),data = rv)
+```
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+```{r}
+
+# rv2 <- rv %>%
+#   add_predictions(model2, "log10pred") %>%
+#   mutate(pred = 10^log10pred) %>%
+#   add_residuals(model2, "residuals")
+set.seed(5)
+split_data <- crossv_kfold(rv, 10)
+
+
+do_cv <- function(formula) {
+  split_data %>%
+    mutate(fit = map(train,
+                     ~ lm(formula, data = .)),
+         rmse = map2_dbl(fit, test, ~ rmse(.x, .y))) %>%
+    summarize(cv_rmse = mean(rmse)) %>%
+    pull(cv_rmse)
+}
+pred_1_n_2 <- do_cv(log10(life_expectancy_years) ~ log10(infant_mortality_rate_per_1000_births))
+pred_1_n_2_n_3 <- do_cv(log10(life_expectancy_years) ~ log10(infant_mortality_rate_per_1000_births)+log10(murder_per_100000_people))
+pred_1_n_2
+pred_1_n_2_n_3
+
+# set.seed(1)
+# rv_part <- resample_partition(rv, p=c(train=0.6,
+#                                   valid=0.2,
+#                                   test=0.2))
+
+```
+The RMSE of the model with only infant mortality rate as the predictor is higher compared to RMSE of the model with infant mortality rate and murder per 100,000 people as the predictors. So, the model with lower RMSE is the more appropriate model for predciting the values of response variable.
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+```{r}
+set.seed(4010)
+rv_parts <- resample_partition(rv,
+                                    p=c(train=0.5,
+                                        valid=0.25,
+                                        test=0.25))
+
+best_model <- NULL
+
+greedy <- function(res, pred, cnd, split)
+{
+  pred_n_cnd <- paste0(paste0(pred, collapse="+"), "+", cnd)
+  formulas <- lapply(paste0(res, "~", pred_n_cnd), as.formula)
+  rmses <- sapply(formulas,
+                  function(fm) rmse(lm(fm, data=split$train),data=split$valid))
+  names(rmses) <- cnd
+  attr(rmses, "best") <- rmses[which.min(rmses)]
+  rmses
+}
+```
+
+```{r}
+pred <- "1"
+cnd <- c("log10(infant_mortality_rate_per_1000_births)", "log10(murder_per_100000_people)", "log10(gdppercapita_us_inflation_adjusted)", "medical_doctors_per_1000_people", "poverty_percent_people_below_550_a_day") 
+
+first <- greedy("log10(life_expectancy_years)", pred, cnd, rv_parts)
+
+best_model <- c(best_model, attr(first, "best"))
+best_model
+```
+```{r}
+pred <- "log10(infant_mortality_rate_per_1000_births)"
+
+cnd <- c("log10(murder_per_100000_people)", "log10(gdppercapita_us_inflation_adjusted)", "medical_doctors_per_1000_people", "poverty_percent_people_below_550_a_day")
+
+first <- greedy("log10(life_expectancy_years)", pred, cnd, rv_parts)
+
+best_model <- c(best_model, attr(first, "best"))
+best_model
+```
+```{r}
+pred <- c("log10(infant_mortality_rate_per_1000_births)","log10(murder_per_100000_people)")
+cnd <- c("log10(gdppercapita_us_inflation_adjusted)", "medical_doctors_per_1000_people", "poverty_percent_people_below_550_a_day")
+first <- greedy("log10(life_expectancy_years)", pred, cnd, rv_parts)
+
+best_model <- c(best_model, attr(first, "best"))
+best_model[length(best_model)]
+```
+```{r}
+pred <- c("log10(infant_mortality_rate_per_1000_births)","log10(murder_per_100000_people)",
+          "log10(gdppercapita_us_inflation_adjusted)")
+cnd <- c("medical_doctors_per_1000_people","poverty_percent_people_below_550_a_day")
+first <- greedy("log10(life_expectancy_years)", pred, cnd, rv_parts)
+
+best_model <- c(best_model, attr(first, "best"))
+best_model
+```
+
+```{r}
+pred <- c("log10(infant_mortality_rate_per_1000_births)","log10(murder_per_100000_people)",
+          "log10(gdppercapita_us_inflation_adjusted)","poverty_percent_people_below_550_a_day")
+cnd <- c("medical_doctors_per_1000_people")
+first <- greedy("log10(life_expectancy_years)", pred, cnd, rv_parts)
+
+best_model <- c(best_model, attr(first, "best"))
+best_model
+```
+
+```{r}
+
+final_model <- tibble(index=seq_along(best_model),
+                     variable=factor(names(best_model), levels=names(best_model)),
+                     RMSEs=best_model)
+
+ggplot(final_model, aes(y=RMSEs)) +
+  geom_point(aes(x=variable)) +
+  geom_line(aes(x=index)) +
+  labs(title="Selecting from multiple possibilities.") +
+  theme(axis.text.x= element_text(angle = 90, vjust = 0.5, hjust=1))
+
+
+```
+
+```{r}
+model_final1 <- lm(log10(life_expectancy_years) ~ log10(infant_mortality_rate_per_1000_births) + log10(murder_per_100000_people) + log10(gdppercapita_us_inflation_adjusted),data = rv)
+modelr::rmse(model_final1,rv)
+
+model_final2 <- lm(log10(life_expectancy_years) ~ log10(infant_mortality_rate_per_1000_births) + log10(murder_per_100000_people) + log10(gdppercapita_us_inflation_adjusted) + poverty_percent_people_below_550_a_day,data = rv)
+modelr::rmse(model_final2,rv)
+
+model_final3 <- lm(log10(life_expectancy_years) ~ log10(infant_mortality_rate_per_1000_births) + log10(murder_per_100000_people) + log10(gdppercapita_us_inflation_adjusted) + poverty_percent_people_below_550_a_day + medical_doctors_per_1000_people,data = rv)
+modelr::rmse(model_final3,rv)
+```
+
+
+
+
+
