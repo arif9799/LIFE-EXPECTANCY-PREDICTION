@@ -1,5 +1,6 @@
 
 ```{r  echo=TRUE, message=FALSE, warning=FALSE}
+
 library(readr)
 library(dplyr)
 library(ggplot2)
@@ -21,6 +22,7 @@ dplyr::inner_join(as.data.frame(read_csv("ddf--datapoints--poverty_percent_peopl
 Used the cor(x,y,method) function to determine whether which log transformations on the predictor or response variable or log transformations on both of them or none of them, generates stronger co-efficient correlation, and then visualised the plots for response variable versus all predictors as follows.
 
 ```{r  message=FALSE, warning=FALSE}
+
 cor(rv$infant_mortality_rate_per_1000_births, rv$life_expectancy_years, method = c("pearson", "kendall", "spearman"))
 cor(log10(rv$infant_mortality_rate_per_1000_births), rv$life_expectancy_years, method = c("pearson", "kendall", "spearman"))
 cor(rv$infant_mortality_rate_per_1000_births, log10(rv$life_expectancy_years), method = c("pearson", "kendall", "spearman"))
@@ -30,7 +32,7 @@ plt1_g <- ggplot(rv, aes(x=log10(infant_mortality_rate_per_1000_births),y=log10(
         geom_point(size=0.1)+
         geom_smooth(color = "red")+
         geom_smooth(method = "lm")+
-  theme_minimal()
+  theme_dark()
 plt1_g
 
 ```
