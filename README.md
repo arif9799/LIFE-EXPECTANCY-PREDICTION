@@ -1,4 +1,25 @@
-# LIFE-EXPECTANCY-PREDICTION
+<p align="center">
+  
+  ___
+</p>
+<h3 align="center">
+  
+  [Life Expectancy Prediction, _Data Science and Supervised ML_](https://github.com/arif9799/LIFE-EXPECTANCY-PREDICTION)
+</h3>
+<br>
+
+<p align="center">
+  <img src="https://github.com/arif9799/arif9799/blob/main/gifs/LifeExpectancy.gif" width="250" alt="Description">
+</p>
+<br>
+
+_Tomorrow's Time, Today's Numbers: Life Expectancy in a Snap_ 
+
+Forecasted life expectancy by constructing a Linear Regression Model on independent attributes of primary Dataset, with subsequent Feature Engineering of 5 Candidate Predictors & selection of 3 independent variables as Predictors for the Regression Model. Conclusion with Accomplishment an RMSE of 0.0095, exhausting all combination of predictors with response variable ‘Life Expectancy’.
+<br>
+
+
+
 Started with fetching the data from the gapminder dataset, by performing inner join each time a new file was pulled. 
 Inner join on first two files, and then its result’s inner join with third file and so on and so forth. Created a data frame out of it.
 
